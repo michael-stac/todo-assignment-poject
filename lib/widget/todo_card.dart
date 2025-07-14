@@ -128,10 +128,13 @@ class TodoCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+
                 children: [
                   GestureDetector(
                     onTap: onViewDetails,
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.visibility_outlined, size: 18, color: Color(0xffFF6B00)),
                         SizedBox(width: 8),
@@ -146,26 +149,8 @@ class TodoCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(width: 26.5),
-                  Container(width: 2, height: 25, color: Colors.grey),
-                  SizedBox(width: 26.5),
-                  GestureDetector(
-                    onTap: onMarkCompleted,
-                    child: Row(
-                      children: [
-                        Icon(Icons.check_circle_outline, size: 18, color: Color(0xffFF6B00)),
-                        SizedBox(width: 8),
-                        Text(
-                          'Mark as Completed',
-                          style: TextStyle(
-                            color: Color(0xffFF6B00),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+
+
                 ],
               ),
             ),

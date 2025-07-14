@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class TodoDetailPage extends StatelessWidget {
   final String taskId;
@@ -25,9 +27,48 @@ class TodoDetailPage extends StatelessWidget {
         : Colors.grey;
 
     return Scaffold(
+      floatingActionButton: SpeedDial(
+        icon: Icons.task_alt,
+        activeIcon: Icons.close,
+        backgroundColor: Color(0xffFF6B00), // Custom background for FAB
+        foregroundColor: Colors.white,
+        activeBackgroundColor: Colors.red.shade400,
+        activeForegroundColor: Colors.white,
+        closeManually: false,
+        curve: Curves.easeInOut,
+        overlayColor: Colors.black,
+        overlayOpacity: 0.4,
+        elevation: 10,
+        shape: const CircleBorder(),
+        children: [
+          SpeedDialChild(
+            child: const Icon(Icons.check_circle, color: Colors.white),
+            backgroundColor: Colors.green,
+            label: 'Mark as Completed',
+            labelStyle: const TextStyle(fontSize: 14),
+            onTap: () {
+              print("Task marked as completed");
+              // Add your update logic here
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.timelapse, color: Colors.white),
+            backgroundColor: Colors.orange,
+            label: 'Mark as In Progress',
+            labelStyle: const TextStyle(fontSize: 14),
+            onTap: () {
+              print("Task marked as in progress");
+              // Add your update logic here
+            },
+          ),
+        ],
+      ),
+
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+
+
         leading: BackButton(color: Colors.black,),
         title: const Text('Todo Details',  style: TextStyle(
           fontSize: 19,

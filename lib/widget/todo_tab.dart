@@ -12,12 +12,8 @@ class TodoTabBar extends StatefulWidget {
 class _TodoTabBarState extends State<TodoTabBar> {
   String selected = 'All';
 
-  // Removed "Pending"
-  final Map<String, int> tabs = {
-    'All': 15,
-    'In Progress': 5,
-    'Completed': 2,
-  };
+  // Updated to just use labels, no numbers
+  final List<String> tabs = ['All', 'In Progress', 'Completed'];
 
   @override
   Widget build(BuildContext context) {
@@ -35,57 +31,32 @@ class _TodoTabBarState extends State<TodoTabBar> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: tabs.entries.map((entry) {
-                  final isActive = selected == entry.key;
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: tabs.map((tab) {
+                  final isActive = selected == tab;
                   return GestureDetector(
                     onTap: () {
                       setState(() {
-                        selected = entry.key;
+                        selected = tab;
                       });
-                      widget.onTabSelected(entry.key);
+                      widget.onTabSelected(tab);
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        IntrinsicWidth(
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    entry.key,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: isActive ? Color(0xffFF6B00) : Color(0xff667185),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.shade200,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '${entry.value}',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w500,
-                                        color: isActive ? Color(0xffFF6B00) : Color(0xff475367),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Container(
-                                height: 2,
-                                color: isActive ? Color(0xffFF6B00) : Colors.transparent,
-                              ),
-                            ],
+                        Text(
+                          tab,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: isActive ? const Color(0xffFF6B00) : const Color(0xff667185),
                           ),
+                        ),
+                        const SizedBox(height: 6),
+                        Container(
+                          height: 2,
+                          width: 40,
+                          color: isActive ? const Color(0xffFF6B00) : Colors.transparent,
                         ),
                       ],
                     ),
