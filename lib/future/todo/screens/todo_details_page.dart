@@ -1,252 +1,143 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:provider/provider.dart';
 
-class TodoDetailPage extends StatelessWidget {
-  final String taskId;
-  final String title;
-  final String description;
-  final String status;
-  final String date;
+import '../model/todo_model.dart';
+import '../view_model/view_model.dart';
 
-  const TodoDetailPage({
-    Key? key,
-    required this.taskId,
-    required this.title,
-    required this.description,
-    required this.status,
-    required this.date,
-  }) : super(key: key);
+class ProductDetailScreen extends StatelessWidget {
+  final int productId;
+
+  const ProductDetailScreen({super.key, required this.productId});
 
   @override
   Widget build(BuildContext context) {
-    Color statusColor = status == 'Completed'
-        ? Colors.green
-        : status == 'In Progress'
-        ? Colors.orange
-        : Colors.grey;
+    return ChangeNotifierProvider(
+      create: (_) => ProductViewModel()..fetchProductById(productId),
+      child: Consumer<ProductViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.isLoading) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          } else if (viewModel.errorMessage != null) {
+            return Scaffold(
+              body: Center(child: Text(viewModel.errorMessage!)),
+            );
+          } else if (viewModel.selectedProduct != null) {
+            final Product product = viewModel.selectedProduct!;
 
-    return Scaffold(
-      floatingActionButton: SpeedDial(
-        icon: Icons.task_alt,
-        activeIcon: Icons.close,
-        backgroundColor: Color(0xffFF6B00), // Custom background for FAB
-        foregroundColor: Colors.white,
-        activeBackgroundColor: Colors.red.shade400,
-        activeForegroundColor: Colors.white,
-        closeManually: false,
-        curve: Curves.easeInOut,
-        overlayColor: Colors.black,
-        overlayOpacity: 0.4,
-        elevation: 10,
-        shape: const CircleBorder(),
-        children: [
-          SpeedDialChild(
-            child: const Icon(Icons.check_circle, color: Colors.white),
-            backgroundColor: Colors.green,
-            label: 'Mark as Completed',
-            labelStyle: const TextStyle(fontSize: 14),
-            onTap: () {
-              print("Task marked as completed");
-              // Add your update logic here
-            },
-          ),
-          SpeedDialChild(
-            child: const Icon(Icons.timelapse, color: Colors.white),
-            backgroundColor: Colors.orange,
-            label: 'Mark as In Progress',
-            labelStyle: const TextStyle(fontSize: 14),
-            onTap: () {
-              print("Task marked as in progress");
-              // Add your update logic here
-            },
-          ),
-        ],
-      ),
-
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-
-
-        leading: BackButton(color: Colors.black,),
-        title: const Text('Todo Details',  style: TextStyle(
-          fontSize: 19,
-          fontWeight: FontWeight.w500,
-          color: Color(0xffFF6B00),
-        ),),
-
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.black,),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  final TextEditingController titleController = TextEditingController();
-                  final TextEditingController descriptionController = TextEditingController();
-                  final String currentDate = DateTime.now().toLocal().toString().split(' ')[0];
-
-                  return Dialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    backgroundColor: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          /// Top Row with Title and Close Icon
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            return Scaffold(
+              body: Stack(
+                children: [
+                  CustomScrollView(
+                    slivers: [
+                      SliverAppBar(
+                        expandedHeight: 300,
+                        pinned: true,
+                        backgroundColor: Colors.white,
+                        iconTheme: const IconThemeData(color: Colors.black),
+                        flexibleSpace: FlexibleSpaceBar(
+                          background: Image.network(
+                            product.image,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Edit Todo',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                                product.title,
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              GestureDetector(
-                                onTap: () => Navigator.of(context).pop(),
-                                child: Icon(Icons.close, color: Colors.grey[700]),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "\$${product.price}",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star,
+                                          color: Colors.orange, size: 20),
+                                      Text(
+                                        "${product.rating.rate} (${product.rating.count})",
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
+                              const SizedBox(height: 10),
+                              Text(product.description),
+                              const SizedBox(height: 20),
+
+                              const SizedBox(height: 10),
+
                             ],
                           ),
-                          const SizedBox(height: 20),
-
-                          /// Title Field
-                          TextField(
-                            controller: titleController,
-                            decoration: InputDecoration(
-                              labelText: 'Title',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          /// Description Field
-                          TextField(
-                            controller: descriptionController,
-                            decoration: InputDecoration(
-                              labelText: 'Description',
-                              border: OutlineInputBorder(),
-                            ),
-                            maxLines: 3,
-                          ),
-                          const SizedBox(height: 20),
-
-                          /// Full-width Add Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                backgroundColor: const Color(0xffFF6B00),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: () {
-                                final title = titleController.text.trim();
-                                final description = descriptionController.text.trim();
-
-                                if (title.isNotEmpty && description.isNotEmpty) {
-                                  print('Todo added:\nTitle: $title\nDescription: $description\nDate: $currentDate');
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                              child: const Text(
-                                'Edit',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
+                  // BUY BUTTON
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        color: Colors.white,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            textStyle: const TextStyle(fontSize: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: const BorderSide(
+                                color: Colors.black, // Border color
+                                width: 2,            // Border width
                               ),
                             ),
+                            elevation: 0, // optional: remove shadow to make it flat
                           ),
-                        ],
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Buy button tapped!')),
+                            );
+                          },
+                          child: const Text("Buy Now"),
+                        ),
                       ),
                     ),
-                  );
-                },
-              );
-
-            },
-          ),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _buildDetailTile(
-            icon: Icons.assignment_outlined,
-            label: 'Task ID',
-            value: taskId,
-          ),
-          const SizedBox(height: 12),
-          _buildDetailTile(
-            icon: Icons.title,
-            label: 'Title',
-            value: title,
-          ),
-          const SizedBox(height: 12),
-          _buildDetailTile(
-            icon: Icons.notes_outlined,
-            label: 'Description',
-            value: description,
-          ),
-          const SizedBox(height: 12),
-          _buildDetailTile(
-            icon: Icons.flag_outlined,
-            label: 'Status',
-            value: status,
-            valueColor: statusColor,
-          ),
-          const SizedBox(height: 12),
-          _buildDetailTile(
-            icon: Icons.calendar_today_outlined,
-            label: 'Date Created',
-            value: date,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailTile({
-    required IconData icon,
-    required String label,
-    required String value,
-    Color? valueColor,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, color: Colors.grey[700]),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w400,
-                ),
+                  ),
+                  SizedBox(height: 30,)
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: valueColor ?? Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+            );
+          } else {
+            return const Scaffold(
+              body: Center(child: Text("Product not found.")),
+            );
+          }
+        },
+      ),
     );
   }
 }

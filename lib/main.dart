@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'future/todo/screens/todo_list_screen.dart';
-import 'future/todo/service/todo_get_list_service_provider.dart'; // make sure the path is correct
+import 'future/todo/service/todo_get_list_service_provider.dart';
+import 'future/todo/view_model/view_model.dart'; // make sure the path is correct
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TodoProvider()..fetchTodos(),
+      create: (_) => ProductViewModel()..fetchAllProducts(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
         ),
-        home:  TodoListScreen(),
+        home:  ProductScreen(),
       ),
     );
   }

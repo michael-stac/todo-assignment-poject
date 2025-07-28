@@ -1,218 +1,153 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_assignment_project/future/todo/screens/todo_details_page.dart';
 
-import '../../../widget/todo_card.dart';
-import '../../../widget/todo_tab.dart';
-import '../service/todo_get_list_service_provider.dart';
+import '../view_model/view_model.dart';
 
-
-class TodoListScreen extends StatefulWidget {
+class ProductScreen extends StatefulWidget {
   @override
-  _TodoListScreenState createState() => _TodoListScreenState();
+  _ProductScreenState createState() => _ProductScreenState();
 }
 
-class _TodoListScreenState extends State<TodoListScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<TodoProvider>(context, listen: false).fetchTodos();
-  }
+class _ProductScreenState extends State<ProductScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
 
   @override
-
   Widget build(BuildContext context) {
-    final todoProvider = Provider.of<TodoProvider>(context);
-    final todos = todoProvider.todos;
-
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xffFF6B00),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        onPressed: () {
-          _showAddTodoDialog(context);
-        },
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        systemOverlayStyle: SystemUiOverlayStyle.light,
-        title: const Text(
-          'Todos',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w500,
-            color: Color(0xff344054),
-          ),
-        ),
+        title: const Text('Products'),
       ),
-      body: todoProvider.isLoading
-          ? const Center(child: CircularProgressIndicator.adaptive())
-          : Column(
-        children: [
-          TodoTabBar(
-            onTabSelected: (tab) {
-              todoProvider.setFilter(tab);
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: _buildSearchBar(todoProvider),
-          ),
+      body: Consumer<ProductViewModel>(
+        builder: (context, vm, child) {
+          if (vm.isLoading) {
+            return Center(child: CircularProgressIndicator.adaptive());
+          } else if (vm.errorMessage != null) {
+            return Center(child: Text(vm.errorMessage!));
+          } else {
+            final filteredProducts = vm.products.where((product) {
+              return product.title.toLowerCase().contains(searchQuery.toLowerCase());
+            }).toList();
 
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 80),
-              itemCount: todos.length,
-              itemBuilder: (context, index) {
-                final todo = todos[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: TodoCard(
-                    taskId: 'TODO-${todo.id}',
-                    date: 'Jul 13, 2025',
-                    status: todo.completed ? 'Completed' : 'In Progress',
-                    title: todo.title,
-                    description: 'User ID: ${todo.userId}',
-                    onViewDetails: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => TodoDetailPage(
-                            taskId: 'TODO-${todo.id}',
-                            title: todo.title,
-                            description: 'User ID: ${todo.userId}',
-                            status: todo.completed ? 'Completed' : 'In Progress',
-                            date: 'Jul 13, 2025',
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: TextFormField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: 'Search products',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: filteredProducts.isEmpty
+                      ? Center(child: Text('No products found for "$searchQuery"'))
+                      : ListView.builder(
+                    itemCount: filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      final product = filteredProducts[index];
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetailScreen(productId: product.id,),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black45),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              ClipRRect(
+                                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                child: Image.network(
+                                  product.image,
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            product.title,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                '\$${product.price.toStringAsFixed(2)}',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => ProductDetailScreen(productId: product.id,),
+                                                    ),
+                                                  );
+                                                },
+                                                child: const Text(
+                                                  'View',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
-                    onMarkCompleted: () {
-                      print("Mark as Completed tapped for ID: ${todo.id}");
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(TodoProvider todoProvider) {
-    return TextField(
-      onChanged: (value) {
-        todoProvider.updateSearchQuery(value);
-      },
-      decoration: InputDecoration(
-        hintText: 'Search todos...',
-        suffixIcon: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Icon(Icons.search),
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.orange),
-        ),
-      ),
-    );
-  }
-  void _showAddTodoDialog(BuildContext context) {
-    final TextEditingController titleController = TextEditingController();
-    final TextEditingController descriptionController = TextEditingController();
-    final String currentDate = DateTime.now().toLocal().toString().split(' ')[0];
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Add New Todo',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Icon(Icons.close, color: Colors.grey[700]),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Title',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: const Color(0xffFF6B00),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      final title = titleController.text.trim();
-                      final description = descriptionController.text.trim();
-                      if (title.isNotEmpty && description.isNotEmpty) {
-                        print('Todo added:\nTitle: $title\nDescription: $description\nDate: $currentDate');
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: const Text(
-                      'Add Todo',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
-                    ),
                   ),
                 ),
               ],
-            ),
-          ),
-        );
-      },
+            );
+          }
+        },
+      ),
     );
   }
-
-
 }
