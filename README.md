@@ -64,8 +64,3 @@ flutter pub get
 flutter run
 ```
 
-
----
-
-Let me know if you'd like me to save this to a `.md` file for you or help you commit it directly to a GitHub repo.
-```
