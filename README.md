@@ -1,16 +1,82 @@
-# todo_assignment_project
 
-A new Flutter project.
+```markdown
+# 🛍️ Flutter FakeStore App
 
-## Getting Started
+A complete Flutter application that displays products from the [FakeStore API](https://fakestoreapi.com/).  
+Built using **MVVM architecture** with `provider`, this app demonstrates clean code structure, state management, and API integration.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 📸 Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+| Product List | Product Details |
+|--------------|-----------------|
+| ![list](assets/screenshots/product_list.png) | ![detail](assets/screenshots/product_detail.png) |
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+*(Optional: Add real screenshots under `assets/screenshots/`)*
+
+---
+
+## 🚀 Features
+
+- 🔍 View all products from API  
+- 📄 Detailed product view by ID  
+- ✅ MVVM architecture using `ChangeNotifier`  
+- 💡 Provider for state management  
+- 🌐 REST API integration using `http`  
+- 💥 Error handling and loading indicators  
+
+---
+
+## 📂 Project Structure
+
+```
+
+lib/
+├── models/
+│   └── product\_model.dart
+├── services/
+│   └── product\_service.dart
+├── viewmodels/
+│   └── product\_view\_model.dart
+├── screens/
+│   ├── product\_list\_screen.dart
+│   └── product\_detail\_screen.dart
+└── main.dart
+
+````
+
+---
+
+## ▶️ How to Run the Project
+
+### 1. ✅ Prerequisites
+
+- Flutter SDK installed — [Flutter Install Guide](https://flutter.dev/docs/get-started/install)  
+- A device/emulator or simulator  
+- Any IDE (VS Code, Android Studio, etc.)
+
+### 2. 📥 Clone the Repository
+
+```bash
+git clone https://github.com/your-username/flutter-fakestore-app.git
+cd flutter-fakestore-app
+````
+
+### 3. 📦 Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### 4. ▶️ Run the App
+
+```bash
+flutter run
+```
+
+
+---
+
+Let me know if you'd like me to save this to a `.md` file for you or help you commit it directly to a GitHub repo.
+```
