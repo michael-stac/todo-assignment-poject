@@ -5,17 +5,6 @@
 A complete Flutter application that displays products from the [FakeStore API](https://fakestoreapi.com/).  
 Built using **MVVM architecture** with `provider`, this app demonstrates clean code structure, state management, and API integration.
 
----
-
-## 📸 Screenshots
-
-| Product List | Product Details |
-|--------------|-----------------|
-| ![list](assets/screenshots/product_list.png) | ![detail](assets/screenshots/product_detail.png) |
-
-*(Optional: Add real screenshots under `assets/screenshots/`)*
-
----
 
 ## 🚀 Features
 
